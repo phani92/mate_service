@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mate Service - Share & Track Your Mate</title>
+    <meta name="description"
+        content="Track and manage shared Mate bottles among colleagues. Monitor stock, consumption, and payments easily.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🧉 Mate Service</h1>
+            <p class="subtitle">Share, Track, and Enjoy Together</p>
+        </header>
+
+        <!-- Overview Cards -->
+        <section class="overview-section">
+            <div class="card stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-content">
+                    <h3>Total Stock</h3>
+                    <p class="stat-value" id="totalStock">0</p>
+                    <span class="stat-label">bottles</span>
+                </div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <h3>Consumed</h3>
+                    <p class="stat-value" id="totalConsumed">0</p>
+                    <span class="stat-label">bottles</span>
+                </div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-icon">🍾</div>
+                <div class="stat-content">
+                    <h3>Remaining</h3>
+                    <p class="stat-value" id="totalRemaining">0</p>
+                    <span class="stat-label">bottles</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flavor Management -->
+        <section class="card section-card">
+            <h2>🎨 Manage Flavors</h2>
+            <div class="form-group">
+                <div class="input-row">
+                    <input type="text" id="flavorName" placeholder="Flavor name (e.g., Original, Lemon)"
+                        class="input-field">
+                    <input type="number" id="flavorPrice" placeholder="Price per bottle" step="0.01" min="0"
+                        class="input-field">
+                    <input type="number" id="flavorStock" placeholder="Stock (default 24)" value="24" min="0"
+                        class="input-field">
+                    <button id="addFlavorBtn" class="btn btn-primary">Add Flavor</button>
+                </div>
+            </div>
+            <div id="flavorsList" class="flavors-list"></div>
+        </section>
+
+        <!-- User Management -->
+        <section class="card section-card">
+            <h2>👥 Manage Users</h2>
+            <div class="form-group">
+                <div class="input-row">
+                    <input type="text" id="userName" placeholder="Enter colleague's name" class="input-field">
+                    <button id="addUserBtn" class="btn btn-primary">Add User</button>
+                </div>
+            </div>
+            <div id="usersList" class="users-list"></div>
+        </section>
+
+        <!-- Consumption Tracking -->
+        <section class="card section-card">
+            <h2>📊 Track Consumption</h2>
+            <div class="form-group">
+                <div class="input-row">
+                    <select id="consumptionUser" class="select-field">
+                        <option value="">Select user</option>
+                    </select>
+                    <select id="consumptionFlavor" class="select-field">
+                        <option value="">Select flavor</option>
+                    </select>
+                    <input type="number" id="consumptionAmount" placeholder="Bottles taken" min="1" value="1"
+                        class="input-field">
+                    <button id="recordConsumptionBtn" class="btn btn-success">Record</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Consumption Table -->
+        <section class="card section-card">
+            <h2>💰 User Balances</h2>
+            <div class="table-container">
+                <table class="data-table" id="balanceTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Flavor</th>
+                            <th>Bottles</th>
+                            <th>Amount Owed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="balanceTableBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">No consumption recorded yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Payment Processing -->
+        <section class="card section-card">
+            <h2>💳 Process Payment</h2>
+            <div class="form-group">
+                <div class="input-row">
+                    <select id="paymentUser" class="select-field">
+                        <option value="">Select user</option>
+                    </select>
+                    <select id="paymentFlavor" class="select-field">
+                        <option value="">Select flavor</option>
+                    </select>
+                    <input type="number" id="paymentAmount" placeholder="Payment amount" step="0.01" min="0"
+                        class="input-field">
+                    <button id="processPaymentBtn" class="btn btn-accent">Process Payment</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stock Details by Flavor -->
+        <section class="card section-card">
+            <h2>📈 Stock Details</h2>
+            <div id="stockDetails" class="stock-details"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
