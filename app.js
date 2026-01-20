@@ -280,12 +280,10 @@ function renderFlavors() {
                     <div class="flavor-name">${escapeHtml(flavor.name)}</div>
                     <div class="flavor-details">
                         <span>💰 €${flavor.price.toFixed(2)}/bottle</span>
-                        <span>📦 ${flavor.initialStock} initial</span>
                         <span>🍾 ${remaining} left</span>
                     </div>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn btn-small btn-primary" onclick="updateFlavorStock('${flavor.id}')">Update Stock</button>
                     <button class="btn btn-small btn-danger" onclick="removeFlavor('${flavor.id}')">Remove</button>
                 </div>
             </div>
@@ -370,29 +368,26 @@ function renderStockDetails() {
         const consumed = getTotalConsumed(flavor.id);
         const remaining = getRemainingStock(flavor.id);
         const percentage = flavor.initialStock > 0 ? (remaining / flavor.initialStock) * 100 : 0;
+        
+        // Generate bottle icons for stock up to 6 bottles
+        let stockVisualization = '';
+        if (remaining <= 6 && remaining > 0) {
+            stockVisualization = '<div class="bottle-icons">' + '🧉'.repeat(remaining) + ` ${remaining} left</div>`;
+        } else if (remaining > 6) {
+            stockVisualization = `<div class="stock-count">${remaining} bottles left</div>`;
+        } else {
+            stockVisualization = '<div class="stock-count" style="color: var(--danger);">Out of stock</div>';
+        }
 
         return `
             <div class="stock-item">
                 <div class="stock-header">
                     <div class="stock-flavor-name">${escapeHtml(flavor.name)}</div>
+                    <button class="btn btn-small btn-primary" onclick="updateFlavorStock('${flavor.id}')">Update Stock</button>
                 </div>
-                <div class="stock-stats">
-                    <div class="stock-stat">
-                        <span class="stock-stat-label">Initial:</span>
-                        <span class="stock-stat-value">${flavor.initialStock}</span>
-                    </div>
-                    <div class="stock-stat">
-                        <span class="stock-stat-label">Consumed:</span>
-                        <span class="stock-stat-value">${consumed}</span>
-                    </div>
-                    <div class="stock-stat">
-                        <span class="stock-stat-label">Remaining:</span>
-                        <span class="stock-stat-value">${remaining}</span>
-                    </div>
-                    <div class="stock-stat">
-                        <span class="stock-stat-label">Price:</span>
-                        <span class="stock-stat-value">€${flavor.price.toFixed(2)}</span>
-                    </div>
+                <div class="stock-info-row">
+                    <span class="stock-price">💰 €${flavor.price.toFixed(2)}/bottle</span>
+                    ${stockVisualization}
                 </div>
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: ${percentage}%"></div>

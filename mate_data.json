@@ -1,6 +1,39 @@
 {
-    "users": [],
-    "flavors": [],
-    "consumption": [],
-    "payments": []
+  "users": [
+    {
+      "id": "1737371200000",
+      "name": "John Doe"
+    }
+  ],
+  "flavors": [
+    {
+      "id": "1737371201000",
+      "name": "Mate Classic",
+      "price": 1.00,
+      "initialStock": 24
+    },
+    {
+      "id": "1737371202000",
+      "name": "Mate Christmas",
+      "price": 1.00,
+      "initialStock": 24
+    }
+  ],
+  "consumption": [
+    {
+      "id": "1737371203000",
+      "userId": "1737371200000",
+      "flavorId": "1737371201000",
+      "bottles": 18,
+      "timestamp": "2026-01-20T10:00:00.000Z"
+    },
+    {
+      "id": "1737371204000",
+      "userId": "1737371200000",
+      "flavorId": "1737371202000",
+      "bottles": 23,
+      "timestamp": "2026-01-20T10:00:00.000Z"
+    }
+  ],
+  "payments": []
 }

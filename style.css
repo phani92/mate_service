@@ -391,6 +391,35 @@ body {
     color: var(--primary-light);
 }
 
+.stock-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.stock-price {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.bottle-icons {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--primary-light);
+    font-weight: 600;
+}
+
+.stock-count {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
 .stock-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
