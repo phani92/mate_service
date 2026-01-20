@@ -1,3 +1,6 @@
+// Constants
+const LOW_STOCK_THRESHOLD = 6; // Show bottle icons when stock is at or below this level
+
 // Application State
 let state = {
     users: [],
@@ -369,11 +372,11 @@ function renderStockDetails() {
         const remaining = getRemainingStock(flavor.id);
         const percentage = flavor.initialStock > 0 ? (remaining / flavor.initialStock) * 100 : 0;
         
-        // Generate bottle icons for stock up to 6 bottles
+        // Generate bottle icons for stock at or below threshold
         let stockVisualization = '';
-        if (remaining <= 6 && remaining > 0) {
-            stockVisualization = '<div class="bottle-icons">' + '🧉'.repeat(remaining) + ` ${remaining} left</div>`;
-        } else if (remaining > 6) {
+        if (remaining <= LOW_STOCK_THRESHOLD && remaining > 0) {
+            stockVisualization = `<div class="bottle-icons">${'🧉'.repeat(remaining)} ${remaining} left</div>`;
+        } else if (remaining > LOW_STOCK_THRESHOLD) {
             stockVisualization = `<div class="stock-count">${remaining} bottles left</div>`;
         } else {
             stockVisualization = '<div class="stock-count" style="color: var(--danger);">Out of stock</div>';
