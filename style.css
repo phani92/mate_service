@@ -269,7 +269,7 @@ body {
 }
 
 /* Lists */
-.flavors-list,
+.items-list,
 .users-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -277,7 +277,7 @@ body {
     margin-top: var(--spacing-md);
 }
 
-.flavor-item,
+.item-card,
 .user-item {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
@@ -290,18 +290,18 @@ body {
     animation: slideIn 0.3s ease;
 }
 
-.flavor-item:hover,
+.item-card:hover,
 .user-item:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--primary);
 }
 
-.flavor-info,
+.item-info,
 .user-info {
     flex: 1;
 }
 
-.flavor-name,
+.item-name,
 .user-name {
     font-weight: 600;
     font-size: 1.1rem;
@@ -309,12 +309,12 @@ body {
     color: var(--text-primary);
 }
 
-.flavor-details {
+.item-details {
     font-size: 0.9rem;
     color: var(--text-secondary);
 }
 
-.flavor-details span {
+.item-details span {
     display: inline-block;
     margin-right: var(--spacing-sm);
 }
@@ -385,7 +385,7 @@ body {
     margin-bottom: var(--spacing-sm);
 }
 
-.stock-flavor-name {
+.stock-item-name {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--primary-light);
@@ -405,7 +405,7 @@ body {
     color: var(--text-secondary);
 }
 
-.bottle-icons {
+.stock-icons {
     font-size: 1.5rem;
     display: flex;
     align-items: center;

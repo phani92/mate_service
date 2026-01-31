@@ -1,19 +1,56 @@
-// Constants
-const LOW_STOCK_THRESHOLD = 6; // Show bottle icons when stock is at or below this level
-
 // Application State
 let state = {
     users: [],
-    flavors: [],
-    consumption: [], // { userId, flavorId, bottles, timestamp }
-    payments: [] // { userId, flavorId, amount, timestamp }
+    items: [],
+    consumption: [], // { userId, itemId, quantity, timestamp }
+    payments: [] // { userId, itemId, amount, timestamp }
 };
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+    applyConfig();
     fetchState();
     initEventListeners();
 });
+
+// Apply configuration to UI
+function applyConfig() {
+    // App branding
+    document.getElementById('appTitle').textContent = `${CONFIG.appEmoji} ${CONFIG.appName}`;
+    document.getElementById('appSubtitle').textContent = CONFIG.appSubtitle;
+    document.title = `${CONFIG.appName} - Track & Manage Shared ${CONFIG.terminology.items}`;
+
+    // Icons
+    document.getElementById('stockIcon').textContent = CONFIG.emojis.stock;
+    document.getElementById('consumedIcon').textContent = CONFIG.emojis.consumed;
+    document.getElementById('remainingIcon').textContent = CONFIG.emojis.remaining;
+
+    // Unit labels
+    document.getElementById('stockUnitLabel').textContent = CONFIG.terminology.units;
+    document.getElementById('consumedUnitLabel').textContent = CONFIG.terminology.units;
+    document.getElementById('remainingUnitLabel').textContent = CONFIG.terminology.units;
+
+    // Section labels
+    document.getElementById('trackConsumptionLabel').innerHTML = `${CONFIG.emojis.chart} ${CONFIG.labels.trackConsumption}`;
+    document.getElementById('userBalancesLabel').innerHTML = `${CONFIG.emojis.balance} ${CONFIG.labels.userBalances}`;
+    document.getElementById('processPaymentLabel').innerHTML = `${CONFIG.emojis.payment} ${CONFIG.labels.processPayment}`;
+    document.getElementById('stockDetailsLabel').innerHTML = `📈 ${CONFIG.labels.stockDetails}`;
+    document.getElementById('manageItemsLabel').innerHTML = `🎨 ${CONFIG.labels.manageItems}`;
+    document.getElementById('manageUsersLabel').innerHTML = `${CONFIG.emojis.user} ${CONFIG.labels.manageUsers}`;
+
+    // Table headers
+    document.getElementById('itemColumnHeader').textContent = CONFIG.terminology.item;
+    document.getElementById('unitsColumnHeader').textContent = CONFIG.terminology.units;
+
+    // Placeholders
+    document.getElementById('itemName').placeholder = CONFIG.placeholders.itemName;
+    document.getElementById('itemPrice').placeholder = CONFIG.placeholders.pricePerUnit;
+    document.getElementById('itemStock').placeholder = `${CONFIG.placeholders.stock} (default ${CONFIG.defaults.initialStock})`;
+    document.getElementById('itemStock').value = CONFIG.defaults.initialStock;
+    document.getElementById('userName').placeholder = CONFIG.placeholders.userName;
+    document.getElementById('consumptionAmount').placeholder = CONFIG.placeholders.unitsTaken;
+    document.getElementById('paymentAmount').placeholder = CONFIG.placeholders.paymentAmount;
+}
 
 // API Helper
 async function apiCall(endpoint, method = 'GET', body = null) {
@@ -52,7 +89,7 @@ async function fetchState() {
 // Event Listeners
 function initEventListeners() {
     document.getElementById('addUserBtn').addEventListener('click', addUser);
-    document.getElementById('addFlavorBtn').addEventListener('click', addFlavor);
+    document.getElementById('addItemBtn').addEventListener('click', addItem);
     document.getElementById('recordConsumptionBtn').addEventListener('click', recordConsumption);
     document.getElementById('processPaymentBtn').addEventListener('click', processPayment);
 
@@ -60,8 +97,8 @@ function initEventListeners() {
     document.getElementById('userName').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addUser();
     });
-    document.getElementById('flavorName').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addFlavor();
+    document.getElementById('itemName').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addItem();
     });
 }
 
@@ -95,18 +132,18 @@ async function removeUser(userId) {
     }
 }
 
-// Flavor Management
-async function addFlavor() {
-    const nameInput = document.getElementById('flavorName');
-    const priceInput = document.getElementById('flavorPrice');
-    const stockInput = document.getElementById('flavorStock');
+// Item Management
+async function addItem() {
+    const nameInput = document.getElementById('itemName');
+    const priceInput = document.getElementById('itemPrice');
+    const stockInput = document.getElementById('itemStock');
 
     const name = nameInput.value.trim();
     const price = parseFloat(priceInput.value);
-    const stock = parseInt(stockInput.value) || 24;
+    const stock = parseInt(stockInput.value) || CONFIG.defaults.initialStock;
 
     if (!name) {
-        alert('Please enter a flavor name');
+        alert(`Please enter a ${CONFIG.terminology.item.toLowerCase()} name`);
         return;
     }
 
@@ -115,29 +152,29 @@ async function addFlavor() {
         return;
     }
 
-    const newState = await apiCall('/api/flavors', 'POST', { name, price, stock });
+    const newState = await apiCall('/api/items', 'POST', { name, price, stock });
     if (newState) {
         state = newState;
         nameInput.value = '';
         priceInput.value = '';
-        stockInput.value = '24';
+        stockInput.value = CONFIG.defaults.initialStock;
         render();
     }
 }
 
-async function removeFlavor(flavorId) {
-    if (!confirm('Are you sure you want to remove this flavor? All consumption data for this flavor will be deleted.')) {
+async function removeItem(itemId) {
+    if (!confirm(`Are you sure you want to remove this ${CONFIG.terminology.item.toLowerCase()}? All consumption data for this ${CONFIG.terminology.item.toLowerCase()} will be deleted.`)) {
         return;
     }
 
-    const newState = await apiCall(`/api/flavors/${flavorId}`, 'DELETE');
+    const newState = await apiCall(`/api/items/${itemId}`, 'DELETE');
     if (newState) {
         state = newState;
         render();
     }
 }
 
-async function updateFlavorStock(flavorId) {
+async function updateItemStock(itemId) {
     const newStock = prompt('Enter new stock amount:');
     if (newStock === null) return;
 
@@ -147,7 +184,7 @@ async function updateFlavorStock(flavorId) {
         return;
     }
 
-    const newState = await apiCall(`/api/flavors/${flavorId}/stock`, 'PUT', { stock });
+    const newState = await apiCall(`/api/items/${itemId}/stock`, 'PUT', { stock });
     if (newState) {
         state = newState;
         render();
@@ -157,24 +194,24 @@ async function updateFlavorStock(flavorId) {
 // Consumption Tracking
 async function recordConsumption() {
     const userSelect = document.getElementById('consumptionUser');
-    const flavorSelect = document.getElementById('consumptionFlavor');
+    const itemSelect = document.getElementById('consumptionItem');
     const amountInput = document.getElementById('consumptionAmount');
 
     const userId = userSelect.value;
-    const flavorId = flavorSelect.value;
-    const bottles = parseInt(amountInput.value);
+    const itemId = itemSelect.value;
+    const quantity = parseInt(amountInput.value);
 
-    if (!userId || !flavorId) {
-        alert('Please select both user and flavor');
+    if (!userId || !itemId) {
+        alert(`Please select both user and ${CONFIG.terminology.item.toLowerCase()}`);
         return;
     }
 
-    if (!bottles || bottles <= 0) {
-        alert('Please enter a valid number of bottles');
+    if (!quantity || quantity <= 0) {
+        alert(`Please enter a valid number of ${CONFIG.terminology.units}`);
         return;
     }
 
-    const newState = await apiCall('/api/consumption', 'POST', { userId, flavorId, bottles });
+    const newState = await apiCall('/api/consumption', 'POST', { userId, itemId, quantity });
     if (newState) {
         state = newState;
         amountInput.value = '1';
@@ -185,15 +222,15 @@ async function recordConsumption() {
 // Payment Processing
 async function processPayment() {
     const userSelect = document.getElementById('paymentUser');
-    const flavorSelect = document.getElementById('paymentFlavor');
+    const itemSelect = document.getElementById('paymentItem');
     const amountInput = document.getElementById('paymentAmount');
 
     const userId = userSelect.value;
-    const flavorId = flavorSelect.value;
+    const itemId = itemSelect.value;
     const amount = parseFloat(amountInput.value);
 
-    if (!userId || !flavorId) {
-        alert('Please select both user and flavor');
+    if (!userId || !itemId) {
+        alert(`Please select both user and ${CONFIG.terminology.item.toLowerCase()}`);
         return;
     }
 
@@ -202,7 +239,7 @@ async function processPayment() {
         return;
     }
 
-    const newState = await apiCall('/api/payments', 'POST', { userId, flavorId, amount });
+    const newState = await apiCall('/api/payments', 'POST', { userId, itemId, amount });
     if (newState) {
         state = newState;
         amountInput.value = '';
@@ -211,44 +248,44 @@ async function processPayment() {
 }
 
 // Calculations
-function getTotalConsumed(flavorId = null) {
+function getTotalConsumed(itemId = null) {
     return state.consumption
-        .filter(c => !flavorId || c.flavorId === flavorId)
-        .reduce((sum, c) => sum + c.bottles, 0);
+        .filter(c => !itemId || c.itemId === itemId)
+        .reduce((sum, c) => sum + c.quantity, 0);
 }
 
-function getTotalPaid(userId, flavorId) {
+function getTotalPaid(userId, itemId) {
     return state.payments
-        .filter(p => p.userId === userId && p.flavorId === flavorId)
-        .reduce((sum, p) => sum + p.bottlesPaid, 0);
+        .filter(p => p.userId === userId && p.itemId === itemId)
+        .reduce((sum, p) => sum + p.unitsPaid, 0);
 }
 
-function getUserConsumption(userId, flavorId) {
+function getUserConsumption(userId, itemId) {
     return state.consumption
-        .filter(c => c.userId === userId && c.flavorId === flavorId)
-        .reduce((sum, c) => sum + c.bottles, 0);
+        .filter(c => c.userId === userId && c.itemId === itemId)
+        .reduce((sum, c) => sum + c.quantity, 0);
 }
 
-function getRemainingStock(flavorId) {
-    const flavor = state.flavors.find(f => f.id === flavorId);
-    if (!flavor) return 0;
+function getRemainingStock(itemId) {
+    const item = state.items.find(i => i.id === itemId);
+    if (!item) return 0;
 
-    const consumed = getTotalConsumed(flavorId);
-    return flavor.initialStock - consumed;
+    const consumed = getTotalConsumed(itemId);
+    return item.initialStock - consumed;
 }
 
 function getTotalStock() {
-    return state.flavors.reduce((sum, f) => sum + f.initialStock, 0);
+    return state.items.reduce((sum, i) => sum + i.initialStock, 0);
 }
 
 function getTotalRemaining() {
-    return state.flavors.reduce((sum, f) => sum + getRemainingStock(f.id), 0);
+    return state.items.reduce((sum, i) => sum + getRemainingStock(i.id), 0);
 }
 
 // Rendering
 function render() {
     renderOverview();
-    renderFlavors();
+    renderItems();
     renderUsers();
     renderBalanceTable();
     renderStockDetails();
@@ -265,29 +302,28 @@ function renderOverview() {
     document.getElementById('totalRemaining').textContent = totalRemaining;
 }
 
-function renderFlavors() {
-    const container = document.getElementById('flavorsList');
+function renderItems() {
+    const container = document.getElementById('itemsList');
 
-    if (state.flavors.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-tertiary); text-align: center; padding: 1rem;">No flavors added yet</p>';
+    if (state.items.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-tertiary); text-align: center; padding: 1rem;">No ${CONFIG.terminology.items.toLowerCase()} added yet</p>`;
         return;
     }
 
-    container.innerHTML = state.flavors.map(flavor => {
-        const remaining = getRemainingStock(flavor.id);
-        const consumed = getTotalConsumed(flavor.id);
+    container.innerHTML = state.items.map(item => {
+        const remaining = getRemainingStock(item.id);
 
         return `
-            <div class="flavor-item">
-                <div class="flavor-info">
-                    <div class="flavor-name">${escapeHtml(flavor.name)}</div>
-                    <div class="flavor-details">
-                        <span>💰 €${flavor.price.toFixed(2)}/bottle</span>
-                        <span>🍾 ${remaining} left</span>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-name">${escapeHtml(item.name)}</div>
+                    <div class="item-details">
+                        <span>${CONFIG.emojis.price} ${formatCurrency(item.price)}/${CONFIG.terminology.unit}</span>
+                        <span>${CONFIG.emojis.remaining} ${remaining} left</span>
                     </div>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn btn-small btn-danger" onclick="removeFlavor('${flavor.id}')">Remove</button>
+                    <button class="btn btn-small btn-danger" onclick="removeItem('${item.id}')">Remove</button>
                 </div>
             </div>
         `;
@@ -315,25 +351,25 @@ function renderUsers() {
 function renderBalanceTable() {
     const tbody = document.getElementById('balanceTableBody');
 
-    // Create a map of user-flavor combinations with balances
+    // Create a map of user-item combinations with balances
     const balances = [];
 
     state.users.forEach(user => {
-        state.flavors.forEach(flavor => {
-            const consumed = getUserConsumption(user.id, flavor.id);
-            const paid = getTotalPaid(user.id, flavor.id);
+        state.items.forEach(item => {
+            const consumed = getUserConsumption(user.id, item.id);
+            const paid = getTotalPaid(user.id, item.id);
             const owed = consumed - paid;
 
             if (consumed > 0 || paid > 0) {
                 balances.push({
                     userName: user.name,
                     userId: user.id,
-                    flavorName: flavor.name,
-                    flavorId: flavor.id,
-                    bottles: consumed,
+                    itemName: item.name,
+                    itemId: item.id,
+                    quantity: consumed,
                     paid: paid,
                     owed: owed,
-                    amountOwed: owed * flavor.price
+                    amountOwed: owed * item.price
                 });
             }
         });
@@ -347,13 +383,13 @@ function renderBalanceTable() {
     tbody.innerHTML = balances.map(b => `
         <tr>
             <td>${escapeHtml(b.userName)}</td>
-            <td>${escapeHtml(b.flavorName)}</td>
-            <td>${b.bottles} consumed / ${b.paid} paid</td>
+            <td>${escapeHtml(b.itemName)}</td>
+            <td>${b.quantity} consumed / ${b.paid} paid</td>
             <td style="color: ${b.amountOwed > 0 ? 'var(--warning)' : 'var(--success)'}; font-weight: 600;">
-                €${Math.abs(b.amountOwed).toFixed(2)} ${b.amountOwed > 0 ? 'owed' : b.amountOwed < 0 ? 'credit' : ''}
+                ${formatCurrency(Math.abs(b.amountOwed))} ${b.amountOwed > 0 ? 'owed' : b.amountOwed < 0 ? 'credit' : ''}
             </td>
             <td>
-                ${b.owed > 0 ? `<button class="btn btn-small btn-accent" onclick="quickPayment('${b.userId}', '${b.flavorId}', ${b.amountOwed})">Pay Now</button>` : ''}
+                ${b.owed > 0 ? `<button class="btn btn-small btn-accent" onclick="quickPayment('${b.userId}', '${b.itemId}', ${b.amountOwed})">Pay Now</button>` : ''}
             </td>
         </tr>
     `).join('');
@@ -362,22 +398,22 @@ function renderBalanceTable() {
 function renderStockDetails() {
     const container = document.getElementById('stockDetails');
 
-    if (state.flavors.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-tertiary); text-align: center; padding: 1rem;">No flavors added yet</p>';
+    if (state.items.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-tertiary); text-align: center; padding: 1rem;">No ${CONFIG.terminology.items.toLowerCase()} added yet</p>`;
         return;
     }
 
-    container.innerHTML = state.flavors.map(flavor => {
-        const consumed = getTotalConsumed(flavor.id);
-        const remaining = getRemainingStock(flavor.id);
-        const percentage = flavor.initialStock > 0 ? (remaining / flavor.initialStock) * 100 : 0;
+    container.innerHTML = state.items.map(item => {
+        const consumed = getTotalConsumed(item.id);
+        const remaining = getRemainingStock(item.id);
+        const percentage = item.initialStock > 0 ? (remaining / item.initialStock) * 100 : 0;
         
-        // Generate bottle icons for stock at or below threshold
+        // Generate icons for stock at or below threshold
         let stockVisualization = '';
-        if (remaining <= LOW_STOCK_THRESHOLD && remaining > 0) {
-            stockVisualization = `<div class="bottle-icons">${'🧉'.repeat(remaining)} ${remaining} left</div>`;
-        } else if (remaining > LOW_STOCK_THRESHOLD) {
-            stockVisualization = `<div class="stock-count">${remaining} bottles left</div>`;
+        if (remaining <= CONFIG.defaults.lowStockThreshold && remaining > 0) {
+            stockVisualization = `<div class="stock-icons">${CONFIG.emojis.lowStock.repeat(remaining)} ${remaining} left</div>`;
+        } else if (remaining > CONFIG.defaults.lowStockThreshold) {
+            stockVisualization = `<div class="stock-count">${remaining} ${CONFIG.terminology.units} left</div>`;
         } else {
             stockVisualization = '<div class="stock-count" style="color: var(--danger);">Out of stock</div>';
         }
@@ -385,11 +421,11 @@ function renderStockDetails() {
         return `
             <div class="stock-item">
                 <div class="stock-header">
-                    <div class="stock-flavor-name">${escapeHtml(flavor.name)}</div>
-                    <button class="btn btn-small btn-primary" onclick="updateFlavorStock('${flavor.id}')">Update Stock</button>
+                    <div class="stock-item-name">${escapeHtml(item.name)}</div>
+                    <button class="btn btn-small btn-primary" onclick="updateItemStock('${item.id}')">Update Stock</button>
                 </div>
                 <div class="stock-info-row">
-                    <span class="stock-price">💰 €${flavor.price.toFixed(2)}/bottle</span>
+                    <span class="stock-price">${CONFIG.emojis.price} ${formatCurrency(item.price)}/${CONFIG.terminology.unit}</span>
                     ${stockVisualization}
                 </div>
                 <div class="progress-bar">
@@ -409,29 +445,29 @@ function updateSelects() {
 
     userSelects.forEach(select => {
         const currentValue = select.value;
-        select.innerHTML = '<option value="">Select user</option>' +
+        select.innerHTML = `<option value="">${CONFIG.placeholders.selectUser}</option>` +
             state.users.map(u => `<option value="${u.id}">${escapeHtml(u.name)}</option>`).join('');
         select.value = currentValue;
     });
 
-    // Update flavor selects
-    const flavorSelects = [
-        document.getElementById('consumptionFlavor'),
-        document.getElementById('paymentFlavor')
+    // Update item selects
+    const itemSelects = [
+        document.getElementById('consumptionItem'),
+        document.getElementById('paymentItem')
     ];
 
-    flavorSelects.forEach(select => {
+    itemSelects.forEach(select => {
         const currentValue = select.value;
-        select.innerHTML = '<option value="">Select flavor</option>' +
-            state.flavors.map(f => `<option value="${f.id}">${escapeHtml(f.name)}</option>`).join('');
+        select.innerHTML = `<option value="">${CONFIG.placeholders.selectItem}</option>` +
+            state.items.map(i => `<option value="${i.id}">${escapeHtml(i.name)}</option>`).join('');
         select.value = currentValue;
     });
 }
 
 // Quick payment helper
-function quickPayment(userId, flavorId, amount) {
+function quickPayment(userId, itemId, amount) {
     document.getElementById('paymentUser').value = userId;
-    document.getElementById('paymentFlavor').value = flavorId;
+    document.getElementById('paymentItem').value = itemId;
     document.getElementById('paymentAmount').value = amount.toFixed(2);
 
     // Scroll to payment section

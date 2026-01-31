@@ -4,62 +4,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mate Service - Share & Track Your Mate</title>
+    <title>Inventory Service - Track & Manage Shared Items</title>
     <meta name="description"
-        content="Track and manage shared Mate bottles among colleagues. Monitor stock, consumption, and payments easily.">
+        content="Track and manage shared inventory among colleagues. Monitor stock, consumption, and payments easily.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
 </head>
 
 <body>
     <div class="container">
         <header class="header">
-            <h1>🧉 Mate Service</h1>
-            <p class="subtitle">Share, Track, and Enjoy Together</p>
+            <h1 id="appTitle">📦 Inventory Service</h1>
+            <p class="subtitle" id="appSubtitle">Share, Track, and Manage Together</p>
         </header>
 
         <!-- Overview Cards -->
         <section class="overview-section">
             <div class="card stat-card">
-                <div class="stat-icon">📦</div>
+                <div class="stat-icon" id="stockIcon">📦</div>
                 <div class="stat-content">
                     <h3>Total Stock</h3>
                     <p class="stat-value" id="totalStock">0</p>
-                    <span class="stat-label">bottles</span>
+                    <span class="stat-label" id="stockUnitLabel">units</span>
                 </div>
             </div>
             <div class="card stat-card">
-                <div class="stat-icon">✅</div>
+                <div class="stat-icon" id="consumedIcon">✅</div>
                 <div class="stat-content">
                     <h3>Consumed</h3>
                     <p class="stat-value" id="totalConsumed">0</p>
-                    <span class="stat-label">bottles</span>
+                    <span class="stat-label" id="consumedUnitLabel">units</span>
                 </div>
             </div>
             <div class="card stat-card">
-                <div class="stat-icon">🍾</div>
+                <div class="stat-icon" id="remainingIcon">🍾</div>
                 <div class="stat-content">
                     <h3>Remaining</h3>
                     <p class="stat-value" id="totalRemaining">0</p>
-                    <span class="stat-label">bottles</span>
+                    <span class="stat-label" id="remainingUnitLabel">units</span>
                 </div>
             </div>
         </section>
 
         <!-- Consumption Tracking -->
         <section class="card section-card">
-            <h2>📊 Track Consumption</h2>
+            <h2 id="trackConsumptionLabel">📊 Track Consumption</h2>
             <div class="form-group">
                 <div class="input-row">
                     <select id="consumptionUser" class="select-field">
                         <option value="">Select user</option>
                     </select>
-                    <select id="consumptionFlavor" class="select-field">
-                        <option value="">Select flavor</option>
+                    <select id="consumptionItem" class="select-field">
+                        <option value="">Select item</option>
                     </select>
-                    <input type="number" id="consumptionAmount" placeholder="Bottles taken" min="1" value="1"
+                    <input type="number" id="consumptionAmount" placeholder="Units taken" min="1" value="1"
                         class="input-field">
                     <button id="recordConsumptionBtn" class="btn btn-success">Record</button>
                 </div>
@@ -68,14 +69,14 @@
 
         <!-- User Consumption Table -->
         <section class="card section-card">
-            <h2>💰 User Balances</h2>
+            <h2 id="userBalancesLabel">💰 User Balances</h2>
             <div class="table-container">
                 <table class="data-table" id="balanceTable">
                     <thead>
                         <tr>
                             <th>User</th>
-                            <th>Flavor</th>
-                            <th>Bottles</th>
+                            <th id="itemColumnHeader">Item</th>
+                            <th id="unitsColumnHeader">Units</th>
                             <th>Amount Owed</th>
                             <th>Actions</th>
                         </tr>
@@ -91,14 +92,14 @@
 
         <!-- Payment Processing -->
         <section class="card section-card">
-            <h2>💳 Process Payment</h2>
+            <h2 id="processPaymentLabel">💳 Process Payment</h2>
             <div class="form-group">
                 <div class="input-row">
                     <select id="paymentUser" class="select-field">
                         <option value="">Select user</option>
                     </select>
-                    <select id="paymentFlavor" class="select-field">
-                        <option value="">Select flavor</option>
+                    <select id="paymentItem" class="select-field">
+                        <option value="">Select item</option>
                     </select>
                     <input type="number" id="paymentAmount" placeholder="Payment amount" step="0.01" min="0"
                         class="input-field">
@@ -107,35 +108,35 @@
             </div>
         </section>
 
-        <!-- Stock Details by Flavor -->
+        <!-- Stock Details by Item -->
         <section class="card section-card">
-            <h2>📈 Stock Details</h2>
+            <h2 id="stockDetailsLabel">📈 Stock Details</h2>
             <div id="stockDetails" class="stock-details"></div>
         </section>
 
-        <!-- Flavor Management -->
+        <!-- Item Management -->
         <section class="card section-card">
-            <h2>🎨 Manage Flavors</h2>
+            <h2 id="manageItemsLabel">🎨 Manage Items</h2>
             <div class="form-group">
                 <div class="input-row">
-                    <input type="text" id="flavorName" placeholder="Flavor name (e.g., Original, Lemon)"
+                    <input type="text" id="itemName" placeholder="Item name (e.g., Original, Lemon)"
                         class="input-field">
-                    <input type="number" id="flavorPrice" placeholder="Price per bottle" step="0.01" min="0"
+                    <input type="number" id="itemPrice" placeholder="Price per unit" step="0.01" min="0"
                         class="input-field">
-                    <input type="number" id="flavorStock" placeholder="Stock (default 24)" value="24" min="0"
+                    <input type="number" id="itemStock" placeholder="Stock (default 24)" value="24" min="0"
                         class="input-field">
-                    <button id="addFlavorBtn" class="btn btn-primary">Add Flavor</button>
+                    <button id="addItemBtn" class="btn btn-primary">Add Item</button>
                 </div>
             </div>
-            <div id="flavorsList" class="flavors-list"></div>
+            <div id="itemsList" class="items-list"></div>
         </section>
 
         <!-- User Management -->
         <section class="card section-card">
-            <h2>👥 Manage Users</h2>
+            <h2 id="manageUsersLabel">👥 Manage Users</h2>
             <div class="form-group">
                 <div class="input-row">
-                    <input type="text" id="userName" placeholder="Enter colleague's name" class="input-field">
+                    <input type="text" id="userName" placeholder="Enter user's name" class="input-field">
                     <button id="addUserBtn" class="btn btn-primary">Add User</button>
                 </div>
             </div>

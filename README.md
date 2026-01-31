@@ -1,69 +1,143 @@
-# Mate Service 🧉
+# Inventory Service 📦
 
-A simple, self-hosted web application to track Mate consumption and payments among colleagues or friends.
+A simple, customizable inventory management system for tracking shared items among colleagues. Perfect for office drinks, snacks, or any shared consumables.
+
+## Screenshots
+
+### Desktop
+![Desktop View](screenshots/desktop.png)
+
+### Mobile
+![Mobile View](screenshots/mobile.png)
 
 ## Features
 
--   **User Management**: Add and remove users easily.
--   **Flavor Tracking**: Manage different Mate flavors, prices, and stock levels.
--   **Consumption Log**: Track who drank what and when.
--   **Balance System**: Automatically calculates how much each user owes based on their consumption.
--   **Payments**: Record payments to settle balances.
--   **Network Access**: Host on one machine and access from any device on the same network.
--   **Simple Storage**: Data is stored in a simple local JSON file (`mate_data.json`).
+- 📦 **Stock Management** - Track inventory levels for multiple items
+- 👥 **User Management** - Add and manage users who consume items
+- 📊 **Consumption Tracking** - Record who takes what
+- 💳 **Payment Processing** - Track payments and balances
+- 💰 **Balance Overview** - See who owes what at a glance
+- 📱 **Responsive Design** - Works on desktop and mobile
+- 🎨 **Fully Customizable** - Adapt for any product type via config
 
-## Prerequisites
+## Quick Start
 
--   [Node.js](https://nodejs.org/) (v14 or higher recommended)
--   npm (usually comes with Node.js)
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Installation
+2. Start the server:
+   ```bash
+   node server.js
+   ```
 
-1.  Clone the repository or download the source code.
-2.  Navigate to the project directory:
-    ```bash
-    cd mate_service
-    ```
-3.  Install dependencies:
-    ```bash
-    npm install
-    ```
+3. Open `http://localhost:3000` in your browser
 
-## Usage
+## Customization
 
-### Starting the Server
+The app is designed to be easily customizable for different use cases. Edit `config.js` to adapt it:
 
-Run the following command to start the server:
-
-```bash
-node server.js
+### Example: Mate Drinks
+```javascript
+const CONFIG = {
+    appName: "Mate Service",
+    appSubtitle: "Share, Track, and Enjoy Together",
+    appEmoji: "🧉",
+    terminology: {
+        item: "Flavor",
+        items: "Flavors",
+        unit: "bottle",
+        units: "bottles"
+    },
+    emojis: {
+        remaining: "🧉",
+        lowStock: "🧉"
+    },
+    placeholders: {
+        itemName: "Flavor name (e.g., Original, Lemon)"
+    }
+};
 ```
 
-The server will start and display the access URLs:
-
-```text
-Server running on http://localhost:3000
-Available on your network at:
-  http://192.168.1.X:3000
+### Example: Snacks/Chips
+```javascript
+const CONFIG = {
+    appName: "Snack Tracker",
+    appSubtitle: "Track Office Munchies",
+    appEmoji: "🍿",
+    terminology: {
+        item: "Snack",
+        items: "Snacks",
+        unit: "bag",
+        units: "bags"
+    },
+    emojis: {
+        remaining: "🍿",
+        lowStock: "🍿"
+    },
+    placeholders: {
+        itemName: "Snack name (e.g., Doritos, Lays)"
+    }
+};
 ```
 
-### Accessing the App
+### Example: Coffee
+```javascript
+const CONFIG = {
+    appName: "Coffee Club",
+    appSubtitle: "Fuel Your Day Together",
+    appEmoji: "☕",
+    terminology: {
+        item: "Coffee",
+        items: "Coffees",
+        unit: "cup",
+        units: "cups"
+    },
+    emojis: {
+        remaining: "☕",
+        lowStock: "☕"
+    },
+    placeholders: {
+        itemName: "Coffee type (e.g., Espresso, Latte)"
+    }
+};
+```
 
--   **On the host machine**: Open `http://localhost:3000` in your browser.
--   **On other devices**: Use the network URL provided in the terminal output (e.g., `http://192.168.1.X:3000`).
+## Configuration Options
+
+| Option | Description |
+|--------|-------------|
+| `appName` | Name shown in the header |
+| `appSubtitle` | Subtitle text |
+| `appEmoji` | Main emoji for the app |
+| `terminology.item/items` | Singular/plural for your item type |
+| `terminology.unit/units` | Singular/plural for units (bottle, bag, piece, etc.) |
+| `emojis.*` | Various emojis used throughout the UI |
+| `defaults.initialStock` | Default stock when adding new items |
+| `defaults.lowStockThreshold` | When to show visual low-stock warnings |
+| `defaults.currency` | Currency symbol |
+| `defaults.currencyPosition` | "before" or "after" |
+| `labels.*` | Section heading labels |
+| `placeholders.*` | Placeholder text for input fields |
+
+## Data Storage
+
+Data is stored in `inventory_data.json` in the project root. The file is automatically created and updated.
+
+## Network Access
+
+The server binds to `0.0.0.0`, making it accessible from other devices on your network. Check the console output for available network addresses.
 
 ## Running on Windows
 
-The application is fully portable. To run it on Windows:
+Double-click `start_server.bat` to automatically install dependencies and start the server.
 
-1.  Ensure **Node.js** is installed.
-2.  Double-click the `start_server.bat` file included in the folder.
-    -   This script will automatically install dependencies (if needed) and start the server.
-    -   It will keep the window open so you can see the network URL to share with others.
+## Tech Stack
 
-### Data Storage
-
-All data is automatically saved to `mate_data.json` in the project directory. You can back up this file to preserve your data.
+- **Frontend**: Vanilla HTML, CSS, JavaScript
+- **Backend**: Node.js with Express
+- **Storage**: JSON file
 
 ## License
 
