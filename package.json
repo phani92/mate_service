@@ -1,14 +1,15 @@
 {
-  "name": "mate_service",
+  "name": "inventory_service",
   "version": "1.0.0",
-  "main": "app.js",
+  "description": "A customizable inventory management system for tracking shared items",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["inventory", "tracking", "management"],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",

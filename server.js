@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'mate_data.json');
+const DATA_FILE = path.join(__dirname, 'inventory_data.json');
 
 // Middleware
 app.use(cors());
@@ -16,7 +16,7 @@ app.use(express.static(__dirname)); // Serve static files from current directory
 // Initial State
 let state = {
     users: [],
-    flavors: [],
+    items: [],
     consumption: [],
     payments: []
 };
@@ -82,77 +82,75 @@ app.delete('/api/users/:id', (req, res) => {
     res.json(state);
 });
 
-// Add Flavor
-app.post('/api/flavors', (req, res) => {
+// Add Item
+app.post('/api/items', (req, res) => {
     const { name, price, stock } = req.body;
     if (!name || !price) return res.status(400).json({ error: 'Invalid input' });
 
-    if (state.flavors.find(f => f.name.toLowerCase() === name.toLowerCase())) {
-        return res.status(400).json({ error: 'Flavor already exists' });
+    if (state.items.find(i => i.name.toLowerCase() === name.toLowerCase())) {
+        return res.status(400).json({ error: 'Item already exists' });
     }
 
-    const newFlavor = {
+    const newItem = {
         id: Date.now().toString(),
         name,
         price: parseFloat(price),
         initialStock: parseInt(stock) || 0
     };
-    state.flavors.push(newFlavor);
+    state.items.push(newItem);
     saveState();
     res.json(state);
 });
 
-// Remove Flavor
-app.delete('/api/flavors/:id', (req, res) => {
+// Remove Item
+app.delete('/api/items/:id', (req, res) => {
     const { id } = req.params;
-    state.flavors = state.flavors.filter(f => f.id !== id);
-    state.consumption = state.consumption.filter(c => c.flavorId !== id);
-    state.payments = state.payments.filter(p => p.flavorId !== id);
+    state.items = state.items.filter(i => i.id !== id);
+    state.consumption = state.consumption.filter(c => c.itemId !== id);
+    state.payments = state.payments.filter(p => p.itemId !== id);
     saveState();
     res.json(state);
 });
 
-// Update Flavor Stock
-app.put('/api/flavors/:id/stock', (req, res) => {
+// Update Item Stock
+app.put('/api/items/:id/stock', (req, res) => {
     const { id } = req.params;
     const { stock } = req.body;
 
-    const flavor = state.flavors.find(f => f.id === id);
-    if (!flavor) return res.status(404).json({ error: 'Flavor not found' });
+    const item = state.items.find(i => i.id === id);
+    if (!item) return res.status(404).json({ error: 'Item not found' });
 
-    flavor.initialStock = parseInt(stock);
+    item.initialStock = parseInt(stock);
     saveState();
     res.json(state);
 });
 
 // Record Consumption
 app.post('/api/consumption', (req, res) => {
-    const { userId, flavorId, bottles } = req.body;
+    const { userId, itemId, quantity } = req.body;
 
-    if (!userId || !flavorId || !bottles) {
+    if (!userId || !itemId || !quantity) {
         return res.status(400).json({ error: 'Invalid input' });
     }
 
-    // Check stock (optional, but good practice)
-    // We'll skip strict server-side stock check for now to keep it simple, 
-    // or we can duplicate the logic. Let's duplicate for safety.
-    const flavor = state.flavors.find(f => f.id === flavorId);
-    if (!flavor) return res.status(404).json({ error: 'Flavor not found' });
+    // Check stock
+    const item = state.items.find(i => i.id === itemId);
+    if (!item) return res.status(404).json({ error: 'Item not found' });
 
     const consumed = state.consumption
-        .filter(c => c.flavorId === flavorId)
-        .reduce((sum, c) => sum + c.bottles, 0);
+        .filter(c => c.itemId === itemId)
+        .reduce((sum, c) => sum + c.quantity, 0);
 
-    const remaining = flavor.initialStock - consumed;
-    if (bottles > remaining) {
+    const remaining = item.initialStock - consumed;
+    if (quantity > remaining) {
         return res.status(400).json({ error: 'Not enough stock' });
     }
 
     state.consumption.push({
         id: Date.now().toString(),
         userId,
-        flavorId,
-        bottles: parseInt(bottles),
+        itemId,
+        quantity: parseInt(quantity),
         timestamp: new Date().toISOString()
     });
     saveState();
@@ -161,30 +159,29 @@ app.post('/api/consumption', (req, res) => {
 
 // Process Payment
 app.post('/api/payments', (req, res) => {
-    const { userId, flavorId, amount } = req.body;
+    const { userId, itemId, amount } = req.body;
 
-    if (!userId || !flavorId || !amount) {
+    if (!userId || !itemId || !amount) {
         return res.status(400).json({ error: 'Invalid input' });
     }
 
-    const flavor = state.flavors.find(f => f.id === flavorId);
-    if (!flavor) return res.status(404).json({ error: 'Flavor not found' });
+    const item = state.items.find(i => i.id === itemId);
+    if (!item) return res.status(404).json({ error: 'Item not found' });
 
-    const bottlesPaid = Math.floor(parseFloat(amount) / flavor.price);
+    const unitsPaid = Math.floor(parseFloat(amount) / item.price);
 
     state.payments.push({
         id: Date.now().toString(),
         userId,
-        flavorId,
+        itemId,
         amount: parseFloat(amount),
-        bottlesPaid,
+        unitsPaid,
         timestamp: new Date().toISOString()
     });
     saveState();
     res.json(state);
 });
 
-// Start server
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
