@@ -2,6 +2,14 @@
 
 A simple, customizable inventory management system for tracking shared items among colleagues. Perfect for office drinks, snacks, or any shared consumables.
 
+## Screenshots
+
+### Desktop
+![Desktop View](screenshots/desktop.png)
+
+### Mobile
+![Mobile View](screenshots/mobile.png)
+
 ## Features
 
 - 📦 **Stock Management** - Track inventory levels for multiple items
