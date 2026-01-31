@@ -182,7 +182,7 @@ app.post('/api/payments', (req, res) => {
     res.json(state);
 });
 
-// Start server
+// Start HTTP server and log local network addresses
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
 
