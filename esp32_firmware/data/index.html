@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mate Tracker - ESP32</title>
+<link rel="stylesheet" href="style.css">
+<script src="config.js"></script>
+</head>
+<body>
+<div class="container">
+<header class="header">
+<h1 id="appTitle">🧉 Mate Service</h1>
+<p class="subtitle" id="appSubtitle">Share, Track, and Enjoy Together</p>
+<div class="device-status" id="deviceStatus">
+<span class="status-dot"></span>
+<span id="statusText">Connecting...</span>
+</div>
+</header>
+
+<section class="overview-section">
+<div class="card stat-card">
+<div class="stat-icon" id="stockIcon">📦</div>
+<div class="stat-content">
+<h3>Total Stock</h3>
+<p class="stat-value" id="totalStock">0</p>
+<span class="stat-label" id="stockUnitLabel">bottles</span>
+</div>
+</div>
+<div class="card stat-card">
+<div class="stat-icon" id="consumedIcon">✅</div>
+<div class="stat-content">
+<h3>Consumed</h3>
+<p class="stat-value" id="totalConsumed">0</p>
+<span class="stat-label" id="consumedUnitLabel">bottles</span>
+</div>
+</div>
+<div class="card stat-card">
+<div class="stat-icon" id="remainingIcon">🧉</div>
+<div class="stat-content">
+<h3>Remaining</h3>
+<p class="stat-value" id="totalRemaining">0</p>
+<span class="stat-label" id="remainingUnitLabel">bottles</span>
+</div>
+</div>
+</section>
+
+<section class="card section-card">
+<h2 id="trackConsumptionLabel">📊 Track Consumption</h2>
+<div class="form-group">
+<div class="input-row">
+<select id="consumptionUser" class="select-field"><option value="">Select user</option></select>
+<select id="consumptionItem" class="select-field"><option value="">Select item</option></select>
+<input type="number" id="consumptionAmount" placeholder="Units" min="1" value="1" class="input-field">
+<button id="recordConsumptionBtn" class="btn btn-success">Record</button>
+</div>
+</div>
+</section>
+
+<section class="card section-card">
+<h2 id="userBalancesLabel">💰 User Balances</h2>
+<div class="table-container">
+<table class="data-table" id="balanceTable">
+<thead>
+<tr>
+<th>User</th>
+<th id="itemColumnHeader">Item</th>
+<th id="unitsColumnHeader">Units</th>
+<th>Owed</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="balanceTableBody">
+<tr><td colspan="5" class="empty-state">No consumption recorded yet</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="card section-card">
+<h2 id="processPaymentLabel">💳 Process Payment</h2>
+<div class="form-group">
+<div class="input-row">
+<select id="paymentUser" class="select-field"><option value="">Select user</option></select>
+<select id="paymentItem" class="select-field"><option value="">Select item</option></select>
+<input type="number" id="paymentAmount" placeholder="Amount" step="0.01" min="0" class="input-field">
+<button id="processPaymentBtn" class="btn btn-accent">Pay</button>
+</div>
+</div>
+</section>
+
+<section class="card section-card">
+<h2 id="stockDetailsLabel">📈 Stock Details</h2>
+<div id="stockDetails" class="stock-details"></div>
+</section>
+
+<section class="card section-card">
+<h2 id="manageItemsLabel">🎨 Manage Items</h2>
+<div class="form-group">
+<div class="input-row">
+<input type="text" id="itemName" placeholder="Item name" class="input-field">
+<input type="number" id="itemPrice" placeholder="Price" step="0.01" min="0" class="input-field">
+<input type="number" id="itemStock" placeholder="Stock" value="24" min="0" class="input-field">
+<button id="addItemBtn" class="btn btn-primary">Add</button>
+</div>
+</div>
+<div id="itemsList" class="items-list"></div>
+</section>
+
+<section class="card section-card">
+<h2 id="manageUsersLabel">👥 Manage Users</h2>
+<div class="form-group">
+<div class="input-row">
+<input type="text" id="userName" placeholder="User name" class="input-field">
+<button id="addUserBtn" class="btn btn-primary">Add</button>
+</div>
+</div>
+<div id="usersList" class="users-list"></div>
+</section>
+
+<footer class="footer">
+<p>ESP32-C3 Mate Tracker v1.0</p>
+</footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
