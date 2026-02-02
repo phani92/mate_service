@@ -126,7 +126,7 @@ return state.consumption.filter(c=>!itemId||c.itemId===itemId).reduce((s,c)=>s+c
 }
 
 function getTotalPaid(uid,iid){
-return state.payments.filter(p=>p.userId===uid&&p.itemId===iid).reduce((s,p)=>s+(p.unitsPaid||0),0);
+return state.payments.filter(p=>p.userId===uid&&p.itemId===iid).reduce((s,p)=>s+(p.amount||0),0);
 }
 
 function getUserConsumption(uid,iid){

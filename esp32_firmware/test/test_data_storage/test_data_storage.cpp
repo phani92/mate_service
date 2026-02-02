@@ -11,15 +11,10 @@
 #include <Preferences.h>
 #include <vector>
 
-// Configuration constants (matching config.h)
+// Configuration constants (reuse config.h, override NVS_NAMESPACE for tests)
+#include "config.h"
+#undef NVS_NAMESPACE
 #define NVS_NAMESPACE "test_data"
-#define MAX_USERS 20
-#define MAX_ITEMS 50
-#define MAX_CONSUMPTION_RECORDS 500
-#define MAX_PAYMENT_RECORDS 200
-#define DEBUG_PRINT(x)
-#define DEBUG_PRINTLN(x)
-#define DEBUG_PRINTF(...)
 
 // Data structures (copied from data_storage.h to avoid include conflicts)
 struct User {
