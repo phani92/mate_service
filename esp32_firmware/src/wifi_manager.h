@@ -20,8 +20,8 @@ public:
      * @return true if connected successfully
      */
     bool connect(const char* ssid, const char* password) {
-        _ssid = ssid;
-        _password = password;
+        _ssid = String(ssid);
+        _password = String(password);
         
         WiFi.mode(WIFI_STA);
         WiFi.begin(ssid, password);
@@ -61,7 +61,7 @@ public:
         WiFi.disconnect();
         delay(1000);
         
-        return connect(_ssid, _password);
+        return connect(_ssid.c_str(), _password.c_str());
     }
     
     /**
@@ -100,8 +100,8 @@ public:
     }
 
 private:
-    const char* _ssid;
-    const char* _password;
+    String _ssid;
+    String _password;
     bool _connected;
 };
 

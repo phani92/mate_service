@@ -193,13 +193,21 @@ void loop() {
     
     // Heartbeat: brief dim on GREEN LED every 5 seconds when connected
     static unsigned long lastHeartbeat = 0;
-    if (millis() - lastHeartbeat > 5000) {
+    static unsigned long heartbeatDimStart = 0;
+    static bool heartbeatDimActive = false;
+    
+    if (!heartbeatDimActive && millis() - lastHeartbeat > 5000) {
         lastHeartbeat = millis();
         if (systemReady && WiFi.status() == WL_CONNECTED) {
             setLEDColor(0, 5, 0);  // Dim green briefly
-            delay(50);
-            setLEDGreen();  // Back to green
+            heartbeatDimStart = millis();
+            heartbeatDimActive = true;
         }
+    }
+    
+    if (heartbeatDimActive && millis() - heartbeatDimStart > 50) {
+        setLEDGreen();  // Back to green
+        heartbeatDimActive = false;
     }
     
     // Small delay to prevent watchdog issues
