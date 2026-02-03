@@ -174,8 +174,10 @@ void setupWebHandlers(AsyncWebServer& server, DataStorage& storage) {
             }
             
             const char* name = doc["name"];
-            float price = doc["price"] | 0.0f;
-            int stock = doc["stock"] | 24;
+            JsonVariant priceVar = doc["price"];
+            float price = priceVar.isNull() ? 0.0f : priceVar.as<float>();
+            JsonVariant stockVar = doc["stock"];
+            int stock = stockVar.isNull() ? 24 : stockVar.as<int>();
             
             if (!name || strlen(name) == 0) {
                 sendError(request, "Name is required");
