@@ -221,6 +221,7 @@ const CONFIG = {
 | `defaults.currencyPosition` | "before" (€10) or "after" (10€) |
 | `labels.*` | Section heading labels |
 | `placeholders.*` | Placeholder text for input fields |
+| `paymentLink` | External payment URL (e.g., PayPal.me link). When set, the **Pay Now** button opens this link in a new tab in addition to pre-filling the built-in payment form. Leave empty (`""`) to use only the built-in form. |
 
 > **Note for ESP32:** After modifying `config.js`, also update `esp32_firmware/data/config.js` and re-upload the filesystem.
 
