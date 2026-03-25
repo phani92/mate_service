@@ -470,6 +470,11 @@ function quickPayment(userId, itemId, amount) {
     document.getElementById('paymentItem').value = itemId;
     document.getElementById('paymentAmount').value = amount.toFixed(2);
 
+    // Open configured payment link (e.g., PayPal) in a new tab if provided
+    if (CONFIG.paymentLink) {
+        window.open(CONFIG.paymentLink, '_blank', 'noopener,noreferrer');
+    }
+
     // Scroll to payment section
     document.querySelector('#processPaymentBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }

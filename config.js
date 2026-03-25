@@ -61,7 +61,13 @@ const CONFIG = {
         selectItem: "Select flavor",
         unitsTaken: "Bottles taken",
         paymentAmount: "Payment amount"
-    }
+    },
+
+    // Payment link - set this to your payment URL (e.g., a PayPal.me link)
+    // When configured, the "Pay Now" button will open this link in a new tab.
+    // Leave as empty string "" to use only the built-in payment form.
+    // Example: "https://www.paypal.me/yourusername"
+    paymentLink: ""
 };
 
 // Format currency based on config
